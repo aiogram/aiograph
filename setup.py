@@ -70,7 +70,7 @@ setup(
     description='Python asynchronous Telegra.ph API wrapper',
     long_description=get_description(),
     classifiers=[
-        'Development Status :: 4 - Beta'
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Framework :: AsyncIO',
         'Intended Audience :: Developers',
