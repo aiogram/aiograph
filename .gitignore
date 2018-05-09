@@ -53,7 +53,7 @@ ENV/
 .idea/
 
 # Current project
-experiment.py
+experimental/*
 
 # Doc's
 docs/html
