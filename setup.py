@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+import functools
 import pathlib
 import re
 import sys
 
 from setuptools import find_packages, setup
+from setuptools.command.test import test as TestCommand
 
 try:
     from pip.req import parse_requirements
@@ -42,6 +44,7 @@ def get_description():
         return f.read()
 
 
+@functools.lru_cache()
 def get_requirements(filename=None):
     """
     Read requirements from 'requirements txt'
@@ -58,15 +61,28 @@ def get_requirements(filename=None):
     return [str(ir.req) for ir in install_reqs]
 
 
+class PyTest(TestCommand):
+    user_options = []
+
+    def run(self):
+        import subprocess
+        errno = subprocess.call([sys.executable, '-m', 'pytest', '--cov=aiograph', 'tests'])
+        raise SystemExit(errno)
+
+
 setup(
     name='aiograph',
     version=get_version(),
     packages=find_packages(exclude=('tests', 'tests.*', 'examples.*', 'docs',)),
     url='https://github.com/aiogram/aiograph',
     license='MIT',
-    author='Alex Root Junior',
     requires_python='>=3.6',
+    author='Alex Root Junior',
     author_email='aiogram@illemius.xyz',
+    maintainer=', '.join((
+        'Alex Root Junior <jroot.junior@gmail.com>',
+    )),
+    maintainer_email='aiogram@illemius.xyz',
     description='Python asynchronous Telegra.ph API wrapper',
     long_description=get_description(),
     classifiers=[
@@ -79,5 +95,12 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
-    install_requires=get_requirements()
+    install_requires=get_requirements(),
+    tests_require=get_requirements('dev_requirements.txt'),
+    extras_require={
+        'dev': get_requirements('dev_requirements.txt')
+    },
+    cmdclass={
+        'test': PyTest
+    }
 )
