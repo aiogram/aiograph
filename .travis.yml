@@ -1,8 +1,6 @@
 language: python
 python:
   - "3.6"
-virtualenv:
-  system_site_packages: true
 install:
   - python -m pip install .
   - python -m pip install -r dev_requirements.txt
