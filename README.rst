@@ -5,7 +5,7 @@ AIOGraph
    :target: https://pypi.org/project/aiograph/
    :alt: PyPI
 
-.. image:: https://img.shields.io/pypi/status/aiograph.svg?style=flat-square
+.. image:: https://img.shields.io/pypi/status/aiograph.svg
    :target: https://pypi.org/project/aiograph/
    :alt: PyPi status
 
