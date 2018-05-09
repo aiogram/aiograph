@@ -6,6 +6,12 @@ class TelegraphError(Exception):
     match = None
     text = None
 
+    @classmethod
+    def get_text(cls):
+        if cls.text is None and cls.match is not None:
+            return cls.match.replace('_', ' ').capitalize() + '!'
+        return cls.text
+
     def __init_subclass__(cls, match=None, **kwargs):
         super(TelegraphError, cls).__init_subclass__(**kwargs)
         if match is not None:
@@ -25,7 +31,7 @@ class TelegraphError(Exception):
             if err is cls:
                 continue
             if err.match in match:
-                raise err(err.text or description)
+                raise err(err.get_text() or description)
         raise cls(description)
 
 
@@ -35,12 +41,24 @@ class NoFilesPassed(TelegraphError):
 
 
 class AccessTokenInvalid(TelegraphError, match='ACCESS_TOKEN_INVALID'):
-    text = 'Access token invalid!'
+    pass
 
 
 class FieldsFormatInvalid(TelegraphError, match='FIELDS_FORMAT_INVALID'):
-    text = 'Fields format invalid!'
+    pass
 
 
 class UnknownMethod(TelegraphError, match='UNKNOWN_METHOD'):
-    text = 'Unknown method!'
+    pass
+
+
+class ContentRequired(TelegraphError, match='CONTENT_REQUIRED'):
+    pass
+
+
+class ContentTextRequired(TelegraphError, match='CONTENT_TEXT_REQUIRED'):
+    pass
+
+
+class PageNotFound(TelegraphError, match='PAGE_NOT_FOUND'):
+    pass

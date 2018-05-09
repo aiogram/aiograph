@@ -24,6 +24,20 @@ class Page(TelegraphObject):
     author_name: str = ib(default=None)
     author_url: str = ib(default=None)
     image_url: str = ib(default=None)
-    content: List[Union[str, NodeElement]] = ib(default=None, converter=convert_content)
+    content: List[Union[str, NodeElement]] = ib(factory=list, converter=convert_content)
     views: int = ib(default=None)
     can_edit: bool = ib(default=None)
+
+    @property
+    def html_content(self) -> str:
+        """
+        Get content as HTML
+
+        :raise: ValueError if content is not available
+        :return:
+        """
+        if not self.content:
+            raise ValueError('Content is not available!')
+
+        from ..utils.html import node_to_html
+        return node_to_html(self.content)

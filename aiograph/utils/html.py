@@ -82,7 +82,7 @@ def nodes_to_json(nodes: List[Union[str, NodeElement]]) -> List[Union[str, dict]
     result = []
     for node in nodes:
         if isinstance(node, str):
-            result.append(result)
+            result.append(node)
         elif isinstance(node, NodeElement):
             result.append(attr.asdict(node, filter=_node_converter_filter))
     return result
@@ -102,9 +102,7 @@ class HtmlToNodesParser(HTMLParser):
     def __init__(self):
         super(HtmlToNodesParser, self).__init__()
 
-        self.nodes = []
-
-        self.current_nodes = self.nodes
+        self.current_nodes = []
         self.parent_nodes = []
 
     def error(self, message):
@@ -150,7 +148,7 @@ class HtmlToNodesParser(HTMLParser):
             last_node.children.clear()
 
     def handle_data(self, data):
-        self.add_str_node(data.strip())
+        self.add_str_node(data)
 
     def handle_entityref(self, name):
         self.add_str_node(chr(name2codepoint[name]))
@@ -168,4 +166,4 @@ class HtmlToNodesParser(HTMLParser):
             not_closed_tag = self.parent_nodes[-1][-1].tag
             self.error(f"\"{not_closed_tag}\" tag is not closed")
 
-        return self.nodes
+        return self.current_nodes

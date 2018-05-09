@@ -121,7 +121,7 @@ class Telegraph:
 
     @property
     def service(self) -> str:
-        return self._service_url
+        return self._service
 
     @service.setter
     def service(self, value: str):
@@ -151,7 +151,7 @@ class Telegraph:
     def format_service_url(self, path):
         return self._service_url + path
 
-    async def upload(self, *files) -> List[str]:
+    async def upload(self, *files, full=True) -> List[str]:
         to_be_closed = []
         form = aiohttp.FormData(quote_fields=False)
         try:
@@ -185,7 +185,9 @@ class Telegraph:
         if isinstance(result, dict) and 'error' in result:
             raise exceptions.NoFilesPassed()
 
-        return [self.format_service_url(item['src']) for item in result if 'src' in item]
+        if full:
+            return [self.format_service_url(item['src']) for item in result if 'src' in item]
+        return [item['src'] for item in result if 'src' in item]
 
     async def request(self, method: str, *, path: Optional[str] = None, payload: Optional[dict] = None):
         url = self.format_api_url(method, path)
@@ -225,7 +227,22 @@ class Telegraph:
 
         return payload
 
+    async def _mix_payload_author(self, payload: dict) -> dict:
+        account = await self.get_account_info(
+            types.AccountField.AUTHOR_NAME,
+            types.AccountField.AUTHOR_URL
+        )
+
+        if account.author_name:
+            payload.setdefault('author_name', account.author_name)
+        if account.author_url:
+            payload.setdefault('author_url', account.author_url)
+
+        return payload
+
     def _prepare_content(self, content: Union[str, List[Union[str, types.NodeElement]]]) -> str:
+        if content is None:
+            raise exceptions.TelegraphError.detect('CONTENT_REQUIRED')
         if isinstance(content, list):
             content = html.nodes_to_json(content)
         elif isinstance(content, str):
@@ -236,11 +253,11 @@ class Telegraph:
 
         return self._json_serialize(content)
 
-    async def crete_account(self,
-                            short_name: str,
-                            author_name: str = None,
-                            author_url: str = None,
-                            auth: bool = True) -> types.Account:
+    async def create_account(self,
+                             short_name: str,
+                             author_name: str = None,
+                             author_url: str = None,
+                             auth: bool = True) -> types.Account:
         """
         Use this method to create a new Telegraph account.
 
@@ -356,7 +373,8 @@ class Telegraph:
                           author_name: Optional[str] = None,
                           author_url: Optional[str] = None,
                           return_content: Optional[bool] = None,
-                          access_token: Optional[str] = None) -> types.Page:
+                          access_token: Optional[str] = None,
+                          as_user: bool = False) -> types.Page:
         """
         Use this method to create a new Telegraph page.
 
@@ -371,11 +389,15 @@ class Telegraph:
         author's name below the title. Can be any link, not necessarily to a Telegram profile or channel.
         :param content: (Array of Node, up to 64 KB) Required. Content of the page.
         :param return_content: (Boolean, default = false) If true, a content field will be returned in the Page object
+        :param as_user: Set author name and URL from current user.
         :return: Page object
         """
         content = self._prepare_content(content)
-        payload = _generate_payload(**locals())
+        payload = _generate_payload(**locals(), exclude=['as_user'])
         self._mix_payload_token(payload)
+        if as_user:
+            await self._mix_payload_author(payload)
+
         raw = await self.request(Methods.CREATE_PAGE, payload=payload)
 
         return types.Page(**raw)
@@ -387,7 +409,8 @@ class Telegraph:
                         author_name: Optional[str] = None,
                         author_url: Optional[str] = None,
                         return_content: Optional[bool] = None,
-                        access_token: Optional[str] = None) -> types.Page:
+                        access_token: Optional[str] = None,
+                        as_user: bool = False) -> types.Page:
         """
         Use this method to edit an existing Telegraph page.
 
@@ -403,11 +426,15 @@ class Telegraph:
         :param author_url: (String, 0-512 characters) Profile link, opened when users click on the author's
         name below the title. Can be any link, not necessarily to a Telegram profile or channel.
         :param return_content: (Boolean, default = false) If true, a content field will be returned in the Page object.
+        :param as_user: Set author name and URL from current user.
         :return: Page object
         """
         content = self._prepare_content(content)
-        payload = _generate_payload(**locals(), exclude=['path'])
+        payload = _generate_payload(**locals(), exclude=['path', 'as_user'])
         self._mix_payload_token(payload)
+        if as_user:
+            await self._mix_payload_author(payload)
+
         raw = await self.request(Methods.EDIT_PAGE, path=path, payload=payload)
 
         return types.Page(**raw)
@@ -451,7 +478,7 @@ class Telegraph:
         return types.PageList(**raw)
 
     async def get_views(self,
-                        path: Optional[int] = None,
+                        path: str,
                         year: Optional[int] = None,
                         month: Optional[int] = None,
                         day: Optional[int] = None,
