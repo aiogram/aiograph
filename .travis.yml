@@ -1,17 +1,16 @@
-language: python
 sudo: false
 
+language: python
 python:
   - "3.6"
+
 install:
-  - python -m pip install .
-  - python -m pip install -r dev_requirements.txt
+  - python -m pip install -e .[dev]
 script:
   - pytest --cov=aiograph tests/
+after_success:
+  - codecov
 
 branches:
   only:
   - master
-
-after_success:
-  - codecov
