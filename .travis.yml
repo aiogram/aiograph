@@ -5,7 +5,8 @@ python:
   - "3.6"
 
 install:
-  - python -m pip install -e .[dev]
+  - python -m pip install .
+  - python -m pip install -r dev_requirements.txt
 script:
   - pytest --cov=aiograph tests/
 after_success:
