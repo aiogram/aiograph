@@ -134,7 +134,7 @@ setup(
         'Alex Root Junior <jroot.junior@gmail.com>',
     )),
     maintainer_email='aiogram@illemius.xyz',
-    description='Python asynchronous Telegra.ph API wrapper',
+    description='asynchronous Python Telegra.ph API wrapper',
     long_description=get_description(),
     classifiers=[
         'Development Status :: 4 - Beta',
