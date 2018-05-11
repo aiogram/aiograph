@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import functools
-import os
 import pathlib
 import re
 import sys
+from glob import glob
 
 from setuptools import Command, find_packages, setup
 from setuptools.command.test import test as TestCommand
@@ -95,9 +95,8 @@ class UploadCommand(Command):
             return
 
         targets = []
-        for file in os.listdir(self.path):
-            if self.lib_version in file:
-                targets.append(str((self.path / file).absolute()))
+        for file in glob(str(self.path / f"aiograph-{self.lib_version}[-.]*")):
+            targets.append(str((self.path / file).absolute()))
         return targets
 
     def upload(self, targets):
