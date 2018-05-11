@@ -50,3 +50,22 @@ def test_page():
 
     assert len(page.content) == 1
     assert isinstance(page.content[0], types.NodeElement)
+
+
+def test_path_parser():
+    page = types.Page(path='Test-page-11-05')
+
+    path = page.parsed_path
+    assert isinstance(path, types.PagePath)
+    assert path.title == 'Test page'
+    assert path.name == 'Test-page'
+    assert path.day == 5
+    assert path.month == 11
+    assert path.number is None
+
+    assert page.parsed_path.stringify() == page.path
+
+    page = types.Page(path='Bad-path')
+    assert page.parsed_path is None
+
+    assert types.PagePath('page', 5, 11, 42).stringify() == 'page-11-05-42'
