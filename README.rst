@@ -10,11 +10,11 @@ Annotations
 The Telegraph class (``aiograph.Telegraph``) encapsulates all API calls in a single class.
 It provides functions such as create_page, get_views and other's methods described at `Telegra.ph/api <http://telegra.ph/api>`_ page
 
-In the package ``aiograph.types`` stored all data types.
+All data types  stored In the package ``aiograph.types``.
 
 All methods are named following the `PEP-8 <https://www.python.org/dev/peps/pep-0008/>`_ instructions
 for example ``create_account`` for ``createAccount`` method and etc.
-All API methods is awaitable and can be called only inside Event-loop.
+All API methods are awaitable and can be called only inside Event-loop.
 
 Also if you want to upload the file to Telegra.ph service use ``upload`` method
 from the instance of Telegraph class.
