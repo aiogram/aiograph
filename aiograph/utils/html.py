@@ -1,3 +1,4 @@
+from html import escape
 from html.entities import name2codepoint
 from html.parser import HTMLParser
 from typing import List, Union
@@ -26,7 +27,7 @@ def node_to_html(node: Union[str, NodeElement, list]) -> str:
     :return:
     """
     if isinstance(node, str):  # Text
-        return node
+        return escape(node)
 
     elif isinstance(node, list):  # List of nodes
         result = ''
@@ -109,9 +110,6 @@ class HtmlToNodesParser(HTMLParser):
         raise ValueError(message)
 
     def add_str_node(self, s):
-        if not s:
-            return
-
         if self.current_nodes and isinstance(self.current_nodes[-1], str):
             self.current_nodes[-1] += s
         else:

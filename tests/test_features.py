@@ -49,4 +49,20 @@ def test_service(telegraph):
 
     telegraph.service = 'example.com'
 
+
+def test_exceptions_detection():
+    with pytest.raises(exceptions.TelegraphError, match='UNKNOWN') as exc_info:
+        exceptions.TelegraphError.detect('UNKNOWN')
+
+    assert type(exc_info.value) is exceptions.TelegraphError
+
+
+class CustomException(exceptions.TelegraphError, match='CUSTOM'):
+    text = 'My custom error'
+
+
+def test_custom_error():
+    with pytest.raises(CustomException, match='My custom error'):
+        exceptions.TelegraphError.detect('CUSTOM')
+
 # def test_socks5_proxy(): pass
