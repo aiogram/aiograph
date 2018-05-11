@@ -5,6 +5,23 @@ AIOGraph
 
 **aiograph** - asynchronous Python Telegra.ph API wrapper.
 
+Annotations
+-----------
+The Telegraph class (``aiograph.Telegraph``) encapsulates all API calls in a single class.
+It provides functions such as create_page, get_views and other's methods described at `Telegra.ph/api <http://telegra.ph/api>`_ page
+
+In the package ``aiograph.types`` stored all data types.
+
+All methods are named following the `PEP-8 <https://www.python.org/dev/peps/pep-0008/>`_ instructions
+for example ``create_account`` for ``createAccount`` method and etc.
+All API methods is awaitable and can be called only inside Event-loop.
+
+Also if you want to upload the file to Telegra.ph service use ``upload`` method
+from the instance of Telegraph class.
+
+By the end of all actions you will need to close HTTP connections by calling the `close()` method (is awaitable).
+
+
 Installation
 ------------
 
@@ -21,20 +38,6 @@ From sources
     $ git clone https://github.com/aiogram/aiograph.git
     $ cd aiograph
     $ python setup.py install
-
-
-Annotations
------------
-The Telegraph class encapsulates all API calls in a single class. It provides functions such as create_page, get_views and other's methods described at `Telegra.ph/api <http://telegra.ph/api>`_ page
-
-In the package ``aiograph.types`` stored all data types.
-
-All methods are named following the PEP-8 instructions for example create_account for createAccount method and etc.
-All API methods is awaitable and can be called only inside Event-loop.
-
-Also if you want to upload the file to Telegra.ph service use ``upload`` method from the instance of Telegraph class.
-
-By the end of all actions you will need to close HTTP connections by calling the `close()` method (is awaitable)
 
 
 Usage examples
