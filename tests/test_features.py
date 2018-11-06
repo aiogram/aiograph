@@ -42,7 +42,7 @@ def test_token_property(telegraph: Telegraph):
 def test_service(telegraph):
     assert telegraph.service == 'telegra.ph'
     assert telegraph.api_url == f"https://api.{telegraph.service}/"
-    assert telegraph.service_url == f"http://{telegraph.service}"
+    assert telegraph.service_url == f"https://{telegraph.service}"
 
     with pytest.raises(ValueError):
         telegraph.service = telegraph.service_url

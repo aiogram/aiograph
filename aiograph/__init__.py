@@ -5,4 +5,4 @@ from .utils import exceptions
 
 __all__ = ['Telegraph', 'types', 'utils', 'exceptions']
 
-__version__ = '0.1'
+__version__ = '0.2.dev1'

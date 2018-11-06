@@ -35,7 +35,7 @@ content = '<p>Page created by <a href="https://github.com/aiogram/aiograph" targ
 
 def test_service_url(telegraph: Telegraph):
     assert telegraph.service == SERVICE_URL
-    assert telegraph.service_url == f"http://{SERVICE_URL}"
+    assert telegraph.service_url == f"https://{SERVICE_URL}"
     assert telegraph.api_url == f"https://api.{SERVICE_URL}/"
 
 

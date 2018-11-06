@@ -107,10 +107,10 @@ class Telegraph:
 
         if isinstance(proxy, str) and proxy.startswith('socks5://'):
             from aiosocksy.connector import ProxyClientRequest, ProxyConnector
-            connector = ProxyConnector(limit=connections_limit, ssl_context=ssl_context, loop=self.loop)
+            connector = ProxyConnector(limit=connections_limit, ssl=ssl_context, loop=self.loop)
             request_class = ProxyClientRequest
         else:
-            connector = aiohttp.TCPConnector(limit=connections_limit, ssl_context=ssl_context,
+            connector = aiohttp.TCPConnector(limit=connections_limit, ssl=ssl_context,
                                              loop=self.loop)
             request_class = aiohttp.ClientRequest
 
@@ -131,7 +131,7 @@ class Telegraph:
         value = value.rstrip('/')
 
         self._service = value
-        self._service_url = f"http://{value}"
+        self._service_url = f"https://{value}"
         self._api_url = f"https://api.{value}/"
 
     @property
