@@ -110,7 +110,7 @@ class Telegraph:
             connector = ProxyConnector(limit=connections_limit, ssl_context=ssl_context, loop=self.loop)
             request_class = ProxyClientRequest
         else:
-            connector = aiohttp.TCPConnector(limit=connections_limit, ssl_context=ssl_context,
+            connector = aiohttp.TCPConnector(limit=connections_limit, ssl=ssl_context,
                                              loop=self.loop)
             request_class = aiohttp.ClientRequest
 
