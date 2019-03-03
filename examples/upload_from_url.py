@@ -7,9 +7,8 @@ telegraph = Telegraph()
 
 
 async def main():
-    await telegraph.create_account('aiograph-demo')
-    page = await telegraph.create_page('Demo', '<p><strong>Hello, world!</strong></p>')
-    print('Created page:', page.url)
+    telegraph_url = await telegraph.upload_from_url('https://www.python.org/static/img/python-logo.png')
+    print('Uploaded:', telegraph_url)
 
 
 if __name__ == '__main__':

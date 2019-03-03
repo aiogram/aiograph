@@ -105,17 +105,29 @@ class Telegraph:
         # aiohttp main session
         ssl_context = ssl.create_default_context(cafile=certifi.where())
 
-        if isinstance(proxy, str) and proxy.startswith('socks5://'):
-            from aiosocksy.connector import ProxyClientRequest, ProxyConnector
-            connector = ProxyConnector(limit=connections_limit, ssl=ssl_context, loop=self.loop)
-            request_class = ProxyClientRequest
-        else:
-            connector = aiohttp.TCPConnector(limit=connections_limit, ssl=ssl_context,
-                                             loop=self.loop)
-            request_class = aiohttp.ClientRequest
+        if isinstance(proxy, str) and (proxy.startswith('socks5://') or proxy.startswith('socks4://')):
+            from aiohttp_socks import SocksConnector
+            from aiohttp_socks.helpers import parse_socks_url
 
-        self.session = aiohttp.ClientSession(connector=connector, request_class=request_class,
-                                             loop=self.loop, json_serialize=json_serialize)
+            socks_ver, host, port, username, password = parse_socks_url(proxy)
+            if proxy_auth:
+                if not username:
+                    username = proxy_auth.login
+                if not password:
+                    password = proxy_auth.password
+
+            connector = SocksConnector(socks_ver=socks_ver, host=host, port=port,
+                                       username=username, password=password,
+                                       limit=connections_limit, ssl_context=ssl_context,
+                                       rdns=True, loop=self.loop)
+
+            self.proxy = None
+            self.proxy_auth = None
+        else:
+            connector = aiohttp.TCPConnector(limit=connections_limit, ssl_context=ssl_context,
+                                             loop=self.loop)
+
+        self.session = aiohttp.ClientSession(connector=connector, loop=self.loop, json_serialize=json_serialize)
 
         self._token = token
 
@@ -188,6 +200,30 @@ class Telegraph:
         if full:
             return [self.format_service_url(item['src']) for item in result if 'src' in item]
         return [item['src'] for item in result if 'src' in item]
+
+    async def upload_from_url(self, url, filename=None, content_type=None, full=True):
+        form = aiohttp.FormData(quote_fields=False)
+
+        if filename is None:
+            filename = 'file'
+
+        async with self.session.get(url) as response:
+            form.add_field(secrets.token_urlsafe(8),
+                           response.content,
+                           filename=filename,
+                           content_type=content_type)
+
+            async with self.session.post(self.format_service_url('/upload'), data=form) as r:
+                result = await r.json(loads=self._json_deserialize)
+
+        if isinstance(result, dict) and 'error' in result:
+            raise exceptions.NoFilesPassed()
+
+        item = result[0]['src']
+
+        if full:
+            return self.format_service_url(item)
+        return item
 
     async def request(self, method: str, *, path: Optional[str] = None, payload: Optional[dict] = None):
         url = self.format_api_url(method, path)
