@@ -29,7 +29,7 @@ class NodeElement(Node):
 
     tag: str = ib()
     attrs: dict = ib(factory=dict)
-    children: List['NodeElement'] = ib(factory=list, converter=convert_content)
+    children: List[Union['NodeElement', str]] = ib(factory=list, converter=convert_content)
 
     @tag.validator
     def _validate_tag(self, attribute, value):
