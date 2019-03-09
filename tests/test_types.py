@@ -69,3 +69,7 @@ def test_path_parser():
     assert page.parsed_path is None
 
     assert types.PagePath('page', 5, 11, 42).stringify() == 'page-11-05-42'
+
+    page = types.Page(path=None, content=None)
+    assert page.parsed_path is None
+    assert page.content is None
