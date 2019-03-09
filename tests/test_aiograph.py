@@ -8,6 +8,7 @@ from aiograph.api import SERVICE_URL
 from aiograph.utils import exceptions
 
 IMAGE_PATH = Path(__file__).parent / 'telegraph.jpg'
+IMAGE_URL = 'https://www.python.org/static/img/python-logo.png'
 
 SHORT_NAME = 'aiograph_test'
 AUTHOR_NAME = 'AIOGraph Wrapper'
@@ -129,6 +130,21 @@ async def test_upload(telegraph: Telegraph):
 
     with pytest.raises(exceptions.NoFilesPassed):
         await telegraph.upload()
+
+
+@pytest.mark.asyncio
+async def test_upload_from_url(telegraph: Telegraph):
+    photo = await telegraph.upload_from_url(IMAGE_URL)
+
+    assert photo
+    assert isinstance(photo, str)
+    assert telegraph.service in photo
+
+    photo = await telegraph.upload_from_url(IMAGE_URL, full=False)
+    assert telegraph.service not in photo
+
+    with pytest.raises(exceptions.NoFilesPassed):
+        await telegraph.upload_from_url("http://example.com/")
 
 
 @pytest.mark.asyncio
