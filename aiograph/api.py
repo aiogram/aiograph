@@ -1,4 +1,8 @@
 import asyncio
+
+import contextlib
+from contextvars import ContextVar
+
 import os
 import secrets
 import ssl
@@ -66,6 +70,8 @@ class Methods:
 
 
 class Telegraph:
+    __context_token = ContextVar('TelegraphAccessToken')
+
     def __init__(self,
                  token: Optional[str] = None,
                  service_url: str = SERVICE_URL,
@@ -237,7 +243,7 @@ class Telegraph:
 
     @property
     def token(self) -> str:
-        return self._token
+        return self.__context_token.get(None) or self._token
 
     @token.setter
     def token(self, token_or_account: Union[types.Account, str]):
@@ -253,6 +259,12 @@ class Telegraph:
     @token.deleter
     def token(self):
         self._token = None
+
+    @contextlib.contextmanager
+    def with_token(self, token):
+        context_token = self.__context_token.set(token)
+        yield
+        self.__context_token.reset(context_token)
 
     async def close(self):
         await self.session.close()

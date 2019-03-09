@@ -65,4 +65,21 @@ def test_custom_error():
     with pytest.raises(CustomException, match='My custom error'):
         exceptions.TelegraphError.detect('CUSTOM')
 
+
+def test_context_token(telegraph: Telegraph):
+    original_token = telegraph.token
+
+    with telegraph.with_token('foo'):
+        assert telegraph.token == 'foo'
+
+        with telegraph.with_token('bar'):
+            assert telegraph.token == 'bar'
+            telegraph.token = 'baz'
+            assert telegraph.token == 'bar'
+
+        assert telegraph.token == 'foo'
+
+    assert telegraph.token != original_token
+    assert telegraph.token == 'baz'
+
 # def test_socks5_proxy(): pass
