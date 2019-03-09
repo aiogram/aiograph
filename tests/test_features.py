@@ -1,4 +1,6 @@
 import pytest
+from aiohttp import BasicAuth
+from aiohttp_socks import SocksConnector, SocksVer
 
 from aiograph import Telegraph, types
 from aiograph.utils import exceptions
@@ -56,6 +58,11 @@ def test_exceptions_detection():
 
     assert type(exc_info.value) is exceptions.TelegraphError
 
+    with pytest.raises(exceptions.UnknownMethod) as exc_info:
+        exceptions.UnknownMethod.detect('UNKNOWN_METHOD')
+
+    assert type(exc_info.value) is exceptions.UnknownMethod
+
 
 class CustomException(exceptions.TelegraphError, match='CUSTOM'):
     text = 'My custom error'
@@ -82,4 +89,14 @@ def test_context_token(telegraph: Telegraph):
     assert telegraph.token != original_token
     assert telegraph.token == 'baz'
 
-# def test_socks5_proxy(): pass
+
+def test_socks5_proxy():
+    telegraph = Telegraph(proxy='socks5://example.com:1050', proxy_auth=BasicAuth('username', 'password'))
+    connector = telegraph.session._connector
+
+    assert isinstance(connector, SocksConnector)
+    assert connector._socks_ver == SocksVer.SOCKS5
+    assert connector._socks_host == 'example.com'
+    assert connector._socks_port == 1050
+    assert connector._socks_username == 'username'
+    assert connector._socks_password == 'password'
