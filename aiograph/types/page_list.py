@@ -18,4 +18,4 @@ class PageList(TelegraphObject):
     """
 
     total_count: int = ib(default=None)
-    pages: List[Page] = ib(factory=list, convert=pages_converter)
+    pages: List[Page] = ib(factory=list, converter=pages_converter)

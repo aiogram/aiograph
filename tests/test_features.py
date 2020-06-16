@@ -95,7 +95,7 @@ def test_socks5_proxy():
     connector = telegraph.session._connector
 
     assert isinstance(connector, SocksConnector)
-    assert connector._socks_ver == SocksVer.SOCKS5
+    assert connector._socks_ver.value == SocksVer.SOCKS5
     assert connector._socks_host == 'example.com'
     assert connector._socks_port == 1050
     assert connector._socks_username == 'username'

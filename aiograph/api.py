@@ -113,9 +113,9 @@ class Telegraph:
 
         if isinstance(proxy, str) and (proxy.startswith('socks5://') or proxy.startswith('socks4://')):
             from aiohttp_socks import SocksConnector
-            from aiohttp_socks.helpers import parse_socks_url
+            from aiohttp_socks.utils import parse_proxy_url
 
-            socks_ver, host, port, username, password = parse_socks_url(proxy)
+            socks_ver, host, port, username, password = parse_proxy_url(proxy)
             if proxy_auth:
                 if not username:
                     username = proxy_auth.login
@@ -233,7 +233,7 @@ class Telegraph:
 
     async def request(self, method: str, *, path: Optional[str] = None, payload: Optional[dict] = None):
         url = self.format_api_url(method, path)
-        async with self.session.post(url, data=payload) as response:
+        async with self.session.post(url, data=payload, proxy=self.proxy, proxy_auth=self.proxy_auth) as response:
             json_data = await response.json(loads=self._json_deserialize)
 
             if not json_data.get('ok') and 'error' in json_data:
