@@ -60,7 +60,11 @@ def get_requirements(filename=None):
     file = WORK_DIR / filename
 
     install_reqs = parse_requirements(str(file), session='hack')
-    return [str(ir.req) for ir in install_reqs]
+    try:
+        requirements = [str(ir.req) for ir in install_reqs]
+    except:
+        requirements = [str(ir.requirement) for ir in install_reqs]
+    return requirements
 
 
 class PyTest(TestCommand):
